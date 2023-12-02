@@ -10,8 +10,8 @@ public:
     size_type get_x_size() const {return x_size; }
 
 private:
-    T* const data;
-    size_type const y_size, x_size;
+    T* data;
+    size_type y_size, x_size;
 public:
     // весь код основной
 
@@ -32,11 +32,16 @@ public:
     // move равно
     Grid<T>& operator=(Grid<T>&& t){
         delete[] data;
-        data(new T[t->x_size*t->y_size]);
-        data = t->data;
-        t->data = nullptr;
-        x_size = t->x_size;
-        y_size = t->y_size;
+        data = nullptr;
+        // data = new T[t.x_size * t.y_size];
+//        data = t.data;
+//        t.data = nullptr;
+//        x_size = t.x_size;
+//        y_size = t.y_size;
+        std::swap(data, t.data);
+        std::swap(x_size, t.x_size);
+        std::swap(y_size, t.y_size);
+        return *this;
     }
     // move copy
     Grid(Grid<T>&& t): data(new T[t->x_size*t->y_size]), x_size(t->x_size), y_size(t->y_size){
@@ -109,6 +114,15 @@ int main() {
         for (gsize_t x_idx = 0; x_idx != g.get_x_size(); ++x_idx)
             assert(1.0f == g(y_idx, x_idx));
 
-    return 0;
+
+    Grid<float> new_grid(1, 1, 0.0f);
+    new_grid = std::move(g);
+
+    for (gsize_t y_idx = 0; y_idx < new_grid.get_y_size(); ++y_idx) {
+        for (gsize_t x_idx = 0; x_idx < new_grid.get_x_size(); ++x_idx) {
+            std::cout << new_grid[y_idx][x_idx] << ' ';
+        }
+        std::cout << "\n";
+    }
 }
 
